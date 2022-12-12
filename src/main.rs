@@ -1,22 +1,25 @@
 use clap::Parser;
+use std::fs;
 
-/// Simple program to greet a person
+mod omdb;
+
+use crate::omdb::OmdbClient;
+
+/// Movie guessing game
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    /// Name of the person to greet
+    /// IMDB ID of the movie to fetch
     #[arg(short, long)]
-    name: String,
-
-    /// Number of times to greet
-    #[arg(short, long, default_value_t = 1)]
-    count: u8,
+    imdb_id: String,
 }
 
 fn main() {
     let args = Args::parse();
 
-    for _ in 0..args.count {
-        println!("Hello {}!", args.name)
-    }
+    let omdb_api_key = fs::read_to_string("omdb-apikey.txt").unwrap();
+    let omdb_client = OmdbClient::new(omdb_api_key);
+
+    let response = omdb_client.get_movie(&args.imdb_id).unwrap();
+    println!("{response:#?}");
 }
