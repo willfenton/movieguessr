@@ -1,3 +1,5 @@
+#![allow(clippy::large_enum_variant, clippy::result_large_err)]
+
 use clap::Parser;
 use std::fs;
 

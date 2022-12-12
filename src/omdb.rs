@@ -33,7 +33,7 @@ impl OmdbClient {
 
         match &response {
             OmdbResponse::Success(movie) => {
-                if movie.extra.len() > 0 {
+                if !movie.extra.is_empty() {
                     println!("Extra fields in OMDB response for {}: {:?}", imdb_id, movie.extra);
                 }
             }
