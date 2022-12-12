@@ -10,3 +10,4 @@ clap = { version = "4.0.29", features = ["derive"] }
 ureq = { version = "2.5.0", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+dirs = "4.0.0"
