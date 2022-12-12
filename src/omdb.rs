@@ -4,14 +4,14 @@ use std::collections::HashMap;
 use std::time::Duration;
 use ureq::{Agent, AgentBuilder, Error};
 
-pub struct OmdbClient {
+pub struct OMDbClient {
     api_key: String,
     agent: Agent,
 }
 
-impl OmdbClient {
-    pub fn new(api_key: String) -> OmdbClient {
-        OmdbClient {
+impl OMDbClient {
+    pub fn new(api_key: String) -> OMDbClient {
+        OMDbClient {
             api_key,
             agent: AgentBuilder::new()
                 .timeout_read(Duration::from_secs(5))
@@ -20,10 +20,10 @@ impl OmdbClient {
         }
     }
 
-    pub fn get_movie(self, imdb_id: &str) -> Result<OmdbResponse, Error> {
-        let response: OmdbResponse = self
+    pub fn get_movie(self, imdb_id: &str) -> Result<OMDbResponse, Error> {
+        let response: OMDbResponse = self
             .agent
-            .get("http://www.omdbapi.com")
+            .get("https://www.omdbapi.com")
             .query("apikey", &self.api_key)
             .query("i", imdb_id)
             .query("plot", "short")
@@ -32,12 +32,12 @@ impl OmdbClient {
             .unwrap();
 
         match &response {
-            OmdbResponse::Success(movie) => {
+            OMDbResponse::Success(movie) => {
                 if !movie.extra.is_empty() {
                     println!("Extra fields in OMDB response for {}: {:?}", imdb_id, movie.extra);
                 }
             }
-            OmdbResponse::Error(error) => {
+            OMDbResponse::Error(error) => {
                 println!("Error response from OMDB for {}: {}", imdb_id, error.error)
             }
         }
@@ -50,13 +50,13 @@ impl OmdbClient {
 // and the first one that deserializes successfully is the one returned
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
-pub enum OmdbResponse {
-    Error(OmdbError),
-    Success(OmdbMovie),
+pub enum OMDbResponse {
+    Error(OMDbError),
+    Success(OMDbMovie),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct OmdbMovie {
+pub struct OMDbMovie {
     #[serde(rename = "Title")]
     pub title: String,
     #[serde(rename = "Year")]
@@ -86,7 +86,7 @@ pub struct OmdbMovie {
     #[serde(rename = "Poster")]
     pub poster: String,
     #[serde(rename = "Ratings")]
-    pub ratings: Vec<OmdbMovieRating>,
+    pub ratings: Vec<OMDbMovieRating>,
     #[serde(rename = "Metascore")]
     pub metascore: String,
     #[serde(rename = "imdbRating")]
@@ -112,7 +112,7 @@ pub struct OmdbMovie {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct OmdbMovieRating {
+pub struct OMDbMovieRating {
     #[serde(rename = "Source")]
     pub source: String,
     #[serde(rename = "Value")]
@@ -120,7 +120,7 @@ pub struct OmdbMovieRating {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct OmdbError {
+pub struct OMDbError {
     #[serde(rename = "Response")]
     pub response: String,
     #[serde(rename = "Error")]
