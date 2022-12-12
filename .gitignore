@@ -14,3 +14,4 @@ Cargo.lock
 
 # API keys
 omdb-apikey.txt
+tmdb-apikey.txt
