@@ -26,7 +26,7 @@ impl OmdbClient {
             .get("http://www.omdbapi.com")
             .query("apikey", &self.api_key)
             .query("i", imdb_id)
-            .query("plot", "full")
+            .query("plot", "short")
             .call()?
             .into_json()
             .unwrap();
