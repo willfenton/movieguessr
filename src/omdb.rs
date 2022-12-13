@@ -19,15 +19,29 @@ impl OMDbClient {
     }
 
     pub fn get_movie(&self, imdb_id: &str) -> Result<OMDbGetMovieResponse, Error> {
-        let response: OMDbGetMovieResponse = self
+        let body: String = self
             .agent
             .get("https://www.omdbapi.com")
             .query("apikey", &self.api_key)
             .query("i", imdb_id)
             .query("plot", "short")
             .call()?
-            .into_json()
+            .into_string()
             .unwrap();
+
+        // println!("{}", body);
+
+        let response: OMDbGetMovieResponse = serde_json::from_str(&body).unwrap();
+
+        // let response: OMDbGetMovieResponse = self
+        //     .agent
+        //     .get("https://www.omdbapi.com")
+        //     .query("apikey", &self.api_key)
+        //     .query("i", imdb_id)
+        //     .query("plot", "short")
+        //     .call()?
+        //     .into_json()
+        //     .unwrap();
 
         match &response {
             OMDbGetMovieResponse::Success(movie) => {

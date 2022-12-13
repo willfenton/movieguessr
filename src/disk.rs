@@ -22,22 +22,24 @@ impl Disk {
         Disk { data_dir }
     }
 
-    fn path_for(self, imdb_id: &str) -> PathBuf {
-        let mut path = self.data_dir;
+    fn path_for(&self, imdb_id: &str) -> PathBuf {
+        let mut path = self.data_dir.clone();
         path.push(format!("{}.json", imdb_id));
-        dbg!(&path);
         path
     }
 
-    pub fn get_movie(self, imdb_id: &str) -> Option<String> {
+    pub fn get_movie(&self, imdb_id: &str) -> Option<Movie> {
         let path = self.path_for(imdb_id);
         match path.exists() {
-            true => Some(read_to_string(path).unwrap()),
+            true => {
+                let file_contents = read_to_string(path).unwrap();
+                Some(serde_json::from_str(&file_contents).unwrap())
+            }
             false => None,
         }
     }
 
-    pub fn write_movie(self, movie: &Movie) -> Result<(), Error> {
+    pub fn write_movie(&self, movie: &Movie) -> Result<(), Error> {
         let path = self.path_for(&movie.imdb_id);
         write(path, to_string_pretty(movie).unwrap())
     }

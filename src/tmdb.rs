@@ -45,16 +45,30 @@ impl TMDbClient {
 
     pub fn get_movie(&self, tmdb_id: i64) -> Result<TMDbGetMovieResponse, Error> {
         let path = format!("https://api.themoviedb.org/3/movie/{}", tmdb_id);
-        let response: TMDbGetMovieResponse = self
+
+        let body: String = self
             .agent
             .get(&path)
             .query("api_key", &self.api_key)
             .query("append_to_response", "credits,keywords")
             .call()?
-            .into_json()
+            .into_string()
             .unwrap();
 
-        Ok(response)
+        // println!("{}", body);
+
+        // let response: TMDbGetMovieResponse = self
+        //     .agent
+        //     .get(&path)
+        //     .query("api_key", &self.api_key)
+        //     .query("append_to_response", "credits,keywords")
+        //     .call()?
+        //     .into_json()
+        //     .unwrap();
+
+        let response: TMDbMovie = serde_json::from_str(&body).unwrap();
+
+        Ok(TMDbGetMovieResponse::Success(response))
     }
 }
 
@@ -118,24 +132,15 @@ pub struct TMDbMovieKeyword {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct TMDbMovieCrewMember {
-    pub adult: bool,
-    pub gender: i64,
-    pub id: i64,
-    pub known_for_department: String,
-    pub name: String,
-    pub original_name: String,
-    pub popularity: f64,
-    pub profile_path: Option<String>,
-    pub credit_id: String,
-    pub department: String,
-    pub job: String,
+pub struct TMDbMovieCredits {
+    pub cast: Vec<TMDbMovieCastMember>,
+    pub crew: Vec<TMDbMovieCrewMember>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TMDbMovieCastMember {
     pub adult: bool,
-    pub gender: i64,
+    pub gender: Option<i64>,
     pub id: i64,
     pub known_for_department: String,
     pub name: String,
@@ -149,9 +154,18 @@ pub struct TMDbMovieCastMember {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct TMDbMovieCredits {
-    pub cast: Vec<TMDbMovieCastMember>,
-    pub crew: Vec<TMDbMovieCrewMember>,
+pub struct TMDbMovieCrewMember {
+    pub adult: bool,
+    pub gender: Option<i64>,
+    pub id: i64,
+    pub known_for_department: String,
+    pub name: String,
+    pub original_name: String,
+    pub popularity: f64,
+    pub profile_path: Option<String>,
+    pub credit_id: String,
+    pub department: String,
+    pub job: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -185,8 +199,8 @@ pub struct TMDbMovieGenre {
 pub struct TMDbMovieCollection {
     pub id: i64,
     pub name: String,
-    pub poster_path: String,
-    pub backdrop_path: String,
+    pub poster_path: Option<String>,
+    pub backdrop_path: Option<String>,
 }
 
 // https://developers.themoviedb.org/3/movies/get-movie-details
@@ -195,26 +209,26 @@ pub struct TMDbMovieCollection {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TMDbMovie {
     pub adult: bool,
-    pub backdrop_path: String,
-    pub belongs_to_collection: TMDbMovieCollection,
+    pub backdrop_path: Option<String>,
+    pub belongs_to_collection: Option<TMDbMovieCollection>,
     pub budget: i64,
     pub genres: Vec<TMDbMovieGenre>,
-    pub homepage: String,
+    pub homepage: Option<String>,
     pub id: i64,
-    pub imdb_id: String,
+    pub imdb_id: Option<String>,
     pub original_language: String,
     pub original_title: String,
-    pub overview: String,
+    pub overview: Option<String>,
     pub popularity: f64,
-    pub poster_path: String,
+    pub poster_path: Option<String>,
     pub production_companies: Vec<TMDbMovieProductionCompany>,
     pub production_countries: Vec<TMDbMovieProductionCountry>,
     pub release_date: String,
     pub revenue: i64,
-    pub runtime: i64,
+    pub runtime: Option<i64>,
     pub spoken_languages: Vec<TMDbMovieSpokenLanguage>,
     pub status: String,
-    pub tagline: String,
+    pub tagline: Option<String>,
     pub title: String,
     pub video: bool,
     pub vote_average: f64,
