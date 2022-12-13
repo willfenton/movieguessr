@@ -16,7 +16,7 @@ use crate::tmdb::TMDbClient;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    /// IMDB ID of the movie to fetch
+    /// IMDb ID of the movie to fetch
     #[arg(short, long)]
     imdb_id: String,
 }
@@ -40,9 +40,9 @@ fn main() {
     // dbg!(&disk.get_movie(&args.imdb_id));
 
     // let omdb_response = omdb_client.get_movie(&args.imdb_id).unwrap();
-    let tmdb_response = tmdb_client.get_movie(&args.imdb_id).unwrap();
+    let tmdb_response = tmdb_client.find_movie(&args.imdb_id).unwrap().unwrap();
 
-    println!("{tmdb_response:?}");
+    println!("{tmdb_response:#?}");
 
     // match omdb_response {
     //     OMDbResponse::Success(omdb) => {
