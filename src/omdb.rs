@@ -18,8 +18,8 @@ impl OMDbClient {
         OMDbClient { api_key, agent }
     }
 
-    pub fn get_movie(self, imdb_id: &str) -> Result<OMDbResponse, Error> {
-        let response: OMDbResponse = self
+    pub fn get_movie(&self, imdb_id: &str) -> Result<OMDbGetMovieResponse, Error> {
+        let response: OMDbGetMovieResponse = self
             .agent
             .get("https://www.omdbapi.com")
             .query("apikey", &self.api_key)
@@ -30,12 +30,12 @@ impl OMDbClient {
             .unwrap();
 
         match &response {
-            OMDbResponse::Success(movie) => {
+            OMDbGetMovieResponse::Success(movie) => {
                 if !movie.extra.is_empty() {
                     println!("Extra fields in OMDB response for {}: {:?}", imdb_id, movie.extra);
                 }
             }
-            OMDbResponse::Error(error) => {
+            OMDbGetMovieResponse::Error(error) => {
                 println!("Error response from OMDB for {}: {}", imdb_id, error.error)
             }
         }
@@ -48,7 +48,7 @@ impl OMDbClient {
 // and the first one that deserializes successfully is the one returned
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
-pub enum OMDbResponse {
+pub enum OMDbGetMovieResponse {
     Error(OMDbError),
     Success(OMDbMovie),
 }

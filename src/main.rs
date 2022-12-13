@@ -9,8 +9,8 @@ mod omdb;
 mod tmdb;
 
 use crate::disk::Disk;
-use crate::omdb::{OMDbClient, OMDbMovie, OMDbResponse};
-use crate::tmdb::TMDbClient;
+use crate::omdb::{OMDbClient, OMDbGetMovieResponse, OMDbMovie};
+use crate::tmdb::{TMDbClient, TMDbGetMovieResponse, TMDbMovie};
 
 /// Movie guessing game
 #[derive(Parser, Debug)]
@@ -25,6 +25,7 @@ struct Args {
 pub struct Movie {
     imdb_id: String,
     omdb: OMDbMovie,
+    tmdb: TMDbMovie,
 }
 
 fn main() {
@@ -39,10 +40,24 @@ fn main() {
 
     // dbg!(&disk.get_movie(&args.imdb_id));
 
-    // let omdb_response = omdb_client.get_movie(&args.imdb_id).unwrap();
-    let tmdb_response = tmdb_client.find_movie(&args.imdb_id).unwrap().unwrap();
+    let omdb_get_movie_response = omdb_client.get_movie(&args.imdb_id).unwrap();
+    let tmdb_find_movie_result = tmdb_client.find_movie(&args.imdb_id).unwrap().unwrap();
+    let tmdb_get_movie_response = tmdb_client.get_movie(tmdb_find_movie_result.id).unwrap();
 
-    println!("{tmdb_response:#?}");
+    // println!("{tmdb_movie:#?}");
+
+    if let TMDbGetMovieResponse::Success(tmdb) = tmdb_get_movie_response {
+        if let OMDbGetMovieResponse::Success(omdb) = omdb_get_movie_response {
+            let movie = Movie {
+                imdb_id: String::from(&args.imdb_id),
+                omdb,
+                tmdb,
+            };
+            disk.write_movie(&movie).unwrap();
+        }
+    }
+
+    // disk.write_movie()
 
     // match omdb_response {
     //     OMDbResponse::Success(omdb) => {
