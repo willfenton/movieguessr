@@ -5,13 +5,15 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 
 mod disk;
-mod omdb;
-mod tmdb;
-
 use crate::disk::Disk;
+
+mod omdb;
 use crate::omdb::client::OMDbClient;
 use crate::omdb::models::{OMDbGetMovieResponse, OMDbMovie};
-use crate::tmdb::{TMDbClient, TMDbGetMovieResponse, TMDbMovie};
+
+mod tmdb;
+use crate::tmdb::client::TMDbClient;
+use crate::tmdb::models::{TMDbGetMovieResponse, TMDbMovie};
 
 /// Movie guessing game
 #[derive(Parser, Debug)]
