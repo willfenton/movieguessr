@@ -9,12 +9,12 @@ pub struct TMDbClient {
 }
 
 impl TMDbClient {
-    pub fn new(api_key: String) -> TMDbClient {
+    pub fn new(api_key: String) -> Self {
         let agent = AgentBuilder::new()
             .timeout_read(Duration::from_secs(5))
             .timeout_write(Duration::from_secs(5))
             .build();
-        TMDbClient { api_key, agent }
+        Self { api_key, agent }
     }
 
     pub fn find_movie(&self, imdb_id: &str) -> Result<Option<TMDbFindMovieResult>, Error> {

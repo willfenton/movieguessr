@@ -11,7 +11,7 @@ pub struct Disk {
 }
 
 impl Disk {
-    pub fn new() -> Disk {
+    pub fn new() -> Self {
         let mut data_dir = dirs::data_dir().unwrap();
         data_dir.push("movieguessr/");
 
@@ -19,7 +19,7 @@ impl Disk {
             create_dir(&data_dir).unwrap();
         }
 
-        Disk { data_dir }
+        Self { data_dir }
     }
 
     fn path_for(&self, imdb_id: &str) -> PathBuf {

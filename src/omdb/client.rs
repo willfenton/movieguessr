@@ -9,12 +9,12 @@ pub struct OMDbClient {
 }
 
 impl OMDbClient {
-    pub fn new(api_key: String) -> OMDbClient {
+    pub fn new(api_key: String) -> Self {
         let agent = AgentBuilder::new()
             .timeout_read(Duration::from_secs(5))
             .timeout_write(Duration::from_secs(5))
             .build();
-        OMDbClient { api_key, agent }
+        Self { api_key, agent }
     }
 
     pub fn get_movie(&self, imdb_id: &str) -> Result<OMDbGetMovieResponse, Error> {

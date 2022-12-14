@@ -6,12 +6,14 @@ use std::fs;
 use tracing::{event, Level};
 
 mod disk;
+mod game;
 mod movie;
 mod movie_manager;
 mod omdb;
 mod tmdb;
 
 use crate::disk::Disk;
+use crate::game::Game;
 use crate::movie::Movie;
 use crate::movie_manager::MovieManager;
 
@@ -34,10 +36,22 @@ fn main() {
 
     let movie_manager = MovieManager::new(omdb_api_key, tmdb_api_key);
 
+    let game = Game::new(movie_manager);
+
     let file_contents = fs::read_to_string("data/lists/imdb-popular-100.txt").unwrap();
     let imdb_top_250: Vec<&str> = file_contents.lines().collect();
 
-    let movies: Vec<Movie> = imdb_top_250.iter().map(|imdb_id| movie_manager.get_movie(imdb_id)).collect();
-
-    // movies.iter().for_each(|movie| movie.print());
+    for imdb_id in imdb_top_250 {
+        game.play(imdb_id);
+    }
 }
+
+// loop {
+//     get movie
+//     clear screen
+//     print movie info
+//     loop {
+//         get input
+//         if input matches title, break
+//     }
+// }

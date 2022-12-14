@@ -15,8 +15,8 @@ pub struct MovieManager {
 }
 
 impl MovieManager {
-    pub fn new(omdb_api_key: String, tmdb_api_key: String) -> MovieManager {
-        MovieManager {
+    pub fn new(omdb_api_key: String, tmdb_api_key: String) -> Self {
+        Self {
             disk: Disk::new(),
             omdb_client: OMDbClient::new(omdb_api_key),
             tmdb_client: TMDbClient::new(tmdb_api_key),
