@@ -9,7 +9,8 @@ mod omdb;
 mod tmdb;
 
 use crate::disk::Disk;
-use crate::omdb::{OMDbClient, OMDbGetMovieResponse, OMDbMovie};
+use crate::omdb::client::OMDbClient;
+use crate::omdb::models::{OMDbGetMovieResponse, OMDbMovie};
 use crate::tmdb::{TMDbClient, TMDbGetMovieResponse, TMDbMovie};
 
 /// Movie guessing game
