@@ -1,9 +1,9 @@
-use serde_json::to_string_pretty;
+use serde_json::{to_string, to_string_pretty};
 use std::fs::{create_dir, read_to_string, write};
 use std::io::Error;
 use std::path::PathBuf;
 
-use crate::Movie;
+use crate::movie::Movie;
 
 #[derive(Debug)]
 pub struct Disk {
@@ -33,7 +33,8 @@ impl Disk {
         match path.exists() {
             true => {
                 let file_contents = read_to_string(path).unwrap();
-                Some(serde_json::from_str(&file_contents).unwrap())
+                let movie: Movie = serde_json::from_str(&file_contents).expect("deserialize Movie");
+                Some(movie)
             }
             false => None,
         }
@@ -41,6 +42,7 @@ impl Disk {
 
     pub fn write_movie(&self, movie: &Movie) -> Result<(), Error> {
         let path = self.path_for(&movie.imdb_id);
-        write(path, to_string_pretty(movie).unwrap())
+        let serialized_movie = to_string(movie).unwrap();
+        write(path, serialized_movie)
     }
 }

@@ -3,14 +3,17 @@
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::fs;
+use tracing::{event, Level};
 
 mod disk;
+mod movie;
 mod movie_manager;
 mod omdb;
 mod tmdb;
 
 use crate::disk::Disk;
-use crate::movie_manager::{Movie, MovieManager};
+use crate::movie::Movie;
+use crate::movie_manager::MovieManager;
 
 /// Movie guessing game
 #[derive(Parser, Debug)]
@@ -22,6 +25,8 @@ struct Args {
 }
 
 fn main() {
+    tracing_subscriber::fmt::init();
+
     // let args = dbg!(Args::parse());
 
     let omdb_api_key = fs::read_to_string("omdb-apikey.txt").unwrap();
@@ -29,12 +34,10 @@ fn main() {
 
     let movie_manager = MovieManager::new(omdb_api_key, tmdb_api_key);
 
-    let file_contents = fs::read_to_string("data/lists/imdb-top-250.txt").unwrap();
+    let file_contents = fs::read_to_string("data/lists/imdb-popular-100.txt").unwrap();
     let imdb_top_250: Vec<&str> = file_contents.lines().collect();
 
     let movies: Vec<Movie> = imdb_top_250.iter().map(|imdb_id| movie_manager.get_movie(imdb_id)).collect();
 
-    movies
-        .iter()
-        .for_each(|movie| println!("{} ({}) [IMDb:{}, TMDb:{}]", movie.tmdb.title, movie.omdb.year, movie.imdb_id, movie.tmdb.id));
+    // movies.iter().for_each(|movie| movie.print());
 }
