@@ -1,45 +1,29 @@
 use std::time::Duration;
-use ureq::{Agent, AgentBuilder, Error};
 
 use crate::omdb::models::OMDbGetMovieResponse;
 
 pub struct OMDbClient {
     api_key: String,
-    agent: Agent,
+    client: reqwest::Client,
 }
 
 impl OMDbClient {
     pub fn new(api_key: String) -> Self {
-        let agent = AgentBuilder::new()
-            .timeout_read(Duration::from_secs(5))
-            .timeout_write(Duration::from_secs(5))
-            .build();
-        Self { api_key, agent }
+        let client = reqwest::Client::builder().timeout(Duration::from_secs(5)).build().unwrap();
+        Self { api_key, client }
     }
 
-    pub fn get_movie(&self, imdb_id: &str) -> Result<OMDbGetMovieResponse, Error> {
-        // let body: String = self
-        //     .agent
-        //     .get("https://www.omdbapi.com")
-        //     .query("apikey", &self.api_key)
-        //     .query("i", imdb_id)
-        //     .query("plot", "short")
-        //     .call()?
-        //     .into_string()
-        //     .unwrap();
-
-        // println!("{}", body);
-
-        // let response: OMDbGetMovieResponse = serde_json::from_str(&body).unwrap();
-
+    pub async fn get_movie(&self, imdb_id: &str) -> OMDbGetMovieResponse {
+        let query_params: [(&str, &str); 3] = [("apikey", &self.api_key), ("i", imdb_id), ("plot", "short")];
         let response: OMDbGetMovieResponse = self
-            .agent
+            .client
             .get("https://www.omdbapi.com")
-            .query("apikey", &self.api_key)
-            .query("i", imdb_id)
-            .query("plot", "short")
-            .call()?
-            .into_json()
+            .query(&query_params)
+            .send()
+            .await
+            .unwrap()
+            .json()
+            .await
             .unwrap();
 
         match &response {
@@ -53,6 +37,6 @@ impl OMDbClient {
             }
         }
 
-        Ok(response)
+        response
     }
 }

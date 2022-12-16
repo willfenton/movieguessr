@@ -15,32 +15,32 @@ pub struct MovieManager {
 }
 
 impl MovieManager {
-    pub fn new(omdb_api_key: String, tmdb_api_key: String) -> Self {
+    pub async fn new(omdb_api_key: String, tmdb_api_key: String) -> Self {
         Self {
-            disk: Disk::new(),
+            disk: Disk::new().await,
             omdb_client: OMDbClient::new(omdb_api_key),
             tmdb_client: TMDbClient::new(tmdb_api_key),
         }
     }
 
     // TODO: better error handling
-    pub fn get_movie(&self, imdb_id: &str) -> Movie {
-        let span = span!(Level::DEBUG, "get_movie", imdb_id = imdb_id).entered();
+    pub async fn get_movie(&self, imdb_id: &str) -> Movie {
+        // let span = span!(Level::DEBUG, "get_movie", imdb_id = imdb_id).entered();
 
         // we might already have the movie downloaded
-        if let Some(movie) = self.disk.get_movie(imdb_id) {
+        if let Some(movie) = self.disk.get_movie(imdb_id).await {
             event!(Level::DEBUG, "loaded from disk");
-            span.exit();
+            // span.exit();
             return movie;
         }
 
-        let omdb_movie = match self.omdb_client.get_movie(imdb_id).unwrap() {
+        let omdb_movie = match self.omdb_client.get_movie(imdb_id).await {
             OMDbGetMovieResponse::Success(movie) => movie,
             OMDbGetMovieResponse::Error(error) => panic!("{error:?}"),
         };
 
-        let tmdb_id = self.tmdb_client.find_movie(imdb_id).unwrap().unwrap().id;
-        let tmdb_movie = match self.tmdb_client.get_movie(tmdb_id).unwrap() {
+        let tmdb_id = self.tmdb_client.find_movie(imdb_id).await.unwrap().id;
+        let tmdb_movie = match self.tmdb_client.get_movie(tmdb_id).await {
             TMDbGetMovieResponse::Success(movie) => movie,
             TMDbGetMovieResponse::Error(error) => panic!("{error:?}"),
         };
@@ -51,9 +51,9 @@ impl MovieManager {
             tmdb: tmdb_movie,
         };
 
-        self.disk.write_movie(&movie).unwrap();
+        self.disk.write_movie(&movie).await.unwrap();
 
-        span.exit();
+        // span.exit();
 
         movie
     }

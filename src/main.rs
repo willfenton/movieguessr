@@ -26,23 +26,25 @@ struct Args {
     imdb_id: String,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     tracing_subscriber::fmt::init();
 
     // let args = dbg!(Args::parse());
 
-    let omdb_api_key = fs::read_to_string("omdb-apikey.txt").unwrap();
-    let tmdb_api_key = fs::read_to_string("tmdb-apikey.txt").unwrap();
+    let omdb_api_key = tokio::fs::read_to_string("omdb-apikey.txt").await.unwrap();
+    let tmdb_api_key = tokio::fs::read_to_string("tmdb-apikey.txt").await.unwrap();
 
-    let movie_manager = MovieManager::new(omdb_api_key, tmdb_api_key);
+    let movie_manager = MovieManager::new(omdb_api_key, tmdb_api_key).await;
 
-    let game = Game::new(movie_manager);
+    // let game = Game::new(movie_manager);
 
-    let file_contents = fs::read_to_string("data/lists/imdb-popular-100.txt").unwrap();
+    let file_contents = tokio::fs::read_to_string("data/lists/imdb-top-250.txt").await.unwrap();
     let imdb_top_250: Vec<&str> = file_contents.lines().collect();
 
     for imdb_id in imdb_top_250 {
-        game.play(imdb_id);
+        let movie = movie_manager.get_movie(imdb_id).await;
+        // game.play(imdb_id).await;
     }
 }
 
