@@ -37,15 +37,17 @@ async fn main() {
 
     let movie_manager = MovieManager::new(omdb_api_key, tmdb_api_key).await;
 
-    // let game = Game::new(movie_manager);
+    let game = Game::new(movie_manager);
 
     let file_contents = tokio::fs::read_to_string("data/lists/imdb-top-250.txt").await.unwrap();
     let imdb_top_250: Vec<&str> = file_contents.lines().collect();
 
-    for imdb_id in imdb_top_250 {
-        let movie = movie_manager.get_movie(imdb_id).await;
-        // game.play(imdb_id).await;
-    }
+    game.print_events().await;
+
+    // for imdb_id in imdb_top_250 {
+    //     let movie = movie_manager.get_movie(imdb_id).await;
+    //     // game.play(imdb_id).await;
+    // }
 }
 
 // loop {
